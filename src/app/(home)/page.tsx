@@ -1,6 +1,5 @@
 "use client";
 
-import Loader from "@/components/Loader";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -72,7 +71,7 @@ export default function MasterCircularUploadPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <Loader />
+        Loading...
       </div>
     );
   }
