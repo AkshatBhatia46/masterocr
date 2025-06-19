@@ -1,0 +1,92 @@
+{
+    "master_circular_2023": {
+        "content": [
+            {
+                "chapter_number": "chapter number will come here",
+                "chapter_title": "chapter title will come here",
+                "clauses": [
+                    {
+                        "clause_number": "clause number will come here",
+                        "clause_title": "clause title will come here",
+                        "clause_content": "clause content will come here",
+                        "clauses": [
+                            {
+                                "clause_number": "sub clause number will come here",
+                                "clause_title": "sub clause title will come here",
+                                "clause_content": "sub clause content will come here",
+                                "clauses": [
+                                    {
+                                        "clause_number": "sub sub clause number will come here",
+                                        "clause_title": "sub sub clause title will come here",
+                                        "clause_content": "sub sub clause content will come here"
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "clause_number": "clause number will come here",
+                        "clause_title": "clause title will come here",
+                        "clause_content": "clause content will come here"
+                    }
+                ]
+            },
+            {
+                "chapter_number": "chapter number will come here",
+                "chapter_title": "chapter title will come here",
+                "clauses": []
+            }
+        ],
+        "annexures": [
+            {
+                "annexure_title": "annexure title will come here",
+                "annexure_content": "annexure content will come here"
+            }
+        ]
+    },
+    "master_circular_2024": {
+        "content": [
+            {
+                "chapter_number": "chapter number will come here",
+                "chapter_title": "chapter title will come here",
+                "clauses": [
+                    {
+                        "clause_number": "clause number will come here",
+                        "clause_title": "clause title will come here",
+                        "clause_content": "clause content will come here",
+                        "clauses": [
+                            {
+                                "clause_number": "sub clause number will come here",
+                                "clause_title": "sub clause title will come here",
+                                "clause_content": "sub clause content will come here",
+                                "clauses": [
+                                    {
+                                        "clause_number": "sub sub clause number will come here",
+                                        "clause_title": "sub sub clause title will come here",
+                                        "clause_content": "sub sub clause content will come here"
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "clause_number": "clause number will come here",
+                        "clause_title": "clause title will come here",
+                        "clause_content": "clause content will come here"
+                    }
+                ]
+            },
+            {
+                "chapter_number": "chapter number will come here",
+                "chapter_title": "chapter title will come here",
+                "clauses": []
+            }
+        ],
+        "annexures": [
+            {
+                "annexure_title": "annexure title will come here",
+                "annexure_content": "annexure content will come here"
+            }
+        ]
+    }
+}
