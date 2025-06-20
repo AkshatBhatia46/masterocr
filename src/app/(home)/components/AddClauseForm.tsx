@@ -13,13 +13,13 @@ import { OcrImageUpload } from './OcrImageUpload';
 
 
 interface AddClauseFormProps {
-  circularType: CircularType;
+  circularType: CircularType | string;
   chapterIndex: number;
   chapterNumber: string;
   chapterTitle: string;
   parentClausePath?: string[];
   onClose: () => void;
-  onAdd: (circularType: CircularType, chapterIndex: number, clause: Clause, parentClausePath?: string[]) => boolean;
+  onAdd: (circularType: CircularType | string, chapterIndex: number, clause: Clause, parentClausePath?: string[]) => boolean;
 }
 
 export function AddClauseForm({ 

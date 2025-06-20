@@ -1,5 +1,8 @@
 export type CircularType = '2023' | '2024';
 
+// New types for normal circulars
+export type CircularMode = 'master' | 'normal';
+
 export interface Clause {
   clause_number: string;
   clause_title: string;
@@ -25,9 +28,26 @@ export interface CircularContent {
   annexures: Annexure[];
 }
 
+// New interface for normal circular content (no chapters, just clauses)
+export interface NormalCircularContent {
+  clauses: Clause[];
+  annexures: Annexure[];
+}
+
 export interface MasterCircularData {
   master_circular_2023: CircularContent;
   master_circular_2024: CircularContent;
+}
+
+// New interface for normal circulars data
+export interface NormalCircularsData {
+  [circularName: string]: NormalCircularContent;
+}
+
+// Combined data structure
+export interface AllCircularsData {
+  master_circulars: MasterCircularData;
+  normal_circulars: NormalCircularsData;
 }
 
 export interface NavigationState {
@@ -59,4 +79,9 @@ export interface AnnexureFormData {
   annexure_title: string;
   annexure_type: 'form' | 'non-form';
   image?: File;
+}
+
+// New interface for normal circular form
+export interface NormalCircularFormData {
+  circular_name: string;
 } 

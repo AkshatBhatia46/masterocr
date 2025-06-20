@@ -1,7 +1,7 @@
 'use client';
 
-import { Annexure, CircularType } from '../types/masterCircular';
-import { useMasterCircularData } from '../hooks/useMasterCircularData';
+import { Annexure, CircularType, CircularMode } from '../types/masterCircular';
+import { useCircularData } from '../hooks/useMasterCircularData';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -9,15 +9,20 @@ import { FileText, Edit, Trash2 } from 'lucide-react';
 
 interface AnnexuresListProps {
   annexures: Annexure[];
-  circularType: CircularType;
+  circularType: CircularType | string;
+  mode?: CircularMode;
 }
 
-export function AnnexuresList({ annexures, circularType }: AnnexuresListProps) {
-  const { deleteAnnexure } = useMasterCircularData();
+export function AnnexuresList({ annexures, circularType, mode = 'master' }: AnnexuresListProps) {
+  const { deleteAnnexure, deleteAnnexureFromNormalCircular } = useCircularData();
 
   const handleDeleteAnnexure = (annexureIndex: number, annexureTitle: string) => {
     if (confirm(`Are you sure you want to delete the annexure "${annexureTitle}"?`)) {
-      deleteAnnexure(circularType, annexureIndex);
+      if (mode === 'master') {
+        deleteAnnexure(circularType as CircularType, annexureIndex);
+      } else {
+        deleteAnnexureFromNormalCircular(circularType as string, annexureIndex);
+      }
     }
   };
 

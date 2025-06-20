@@ -12,14 +12,14 @@ import { Separator } from '@/components/ui/separator';
 import { OcrImageUpload } from './OcrImageUpload';
 
 interface EditClauseFormProps {
-  circularType: CircularType;
+  circularType: CircularType | string;
   chapterIndex: number;
   chapterNumber: string;
   chapterTitle: string;
   clause: Clause;
   clausePath: string[];
   onClose: () => void;
-  onUpdate: (circularType: CircularType, chapterIndex: number, clausePath: string[], clause: Clause) => boolean;
+  onUpdate: (circularType: CircularType | string, chapterIndex: number, clausePath: string[], clause: Clause) => boolean;
 }
 
 export function EditClauseForm({ 

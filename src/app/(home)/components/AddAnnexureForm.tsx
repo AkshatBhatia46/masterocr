@@ -14,9 +14,9 @@ import { OcrImageUpload } from './OcrImageUpload';
 import { Upload } from 'lucide-react';
 
 interface AddAnnexureFormProps {
-  circularType: CircularType;
+  circularType: CircularType | string;
   onClose: () => void;
-  onAdd: (circularType: CircularType, annexure: Annexure) => boolean;
+  onAdd: (circularType: CircularType | string, annexure: Annexure) => boolean;
 }
 
 export function AddAnnexureForm({ circularType, onClose, onAdd }: AddAnnexureFormProps) {

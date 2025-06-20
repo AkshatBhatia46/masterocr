@@ -1,16 +1,24 @@
 import { useState, useEffect, useCallback } from 'react';
-import { MasterCircularData, CircularType, Chapter, Clause, Annexure } from '../types/masterCircular';
+import { 
+  MasterCircularData, 
+  CircularType, 
+  Chapter, 
+  Clause, 
+  Annexure, 
+  AllCircularsData,
+  CircularMode
+} from '../types/masterCircular';
 import { localStorageService } from '../services/LocalStorageService';
 
-export function useMasterCircularData() {
-  const [data, setData] = useState<MasterCircularData | null>(null);
+export function useCircularData() {
+  const [data, setData] = useState<AllCircularsData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   // Load data from localStorage on mount
   useEffect(() => {
     try {
-      const loadedData = localStorageService.getMasterCircularData();
+      const loadedData = localStorageService.getAllCircularsData();
       setData(loadedData);
       setError(null);
     } catch (err) {
@@ -22,9 +30,9 @@ export function useMasterCircularData() {
   }, []);
 
   // Save data whenever it changes
-  const saveData = useCallback((newData: MasterCircularData) => {
+  const saveData = useCallback((newData: AllCircularsData) => {
     try {
-      const success = localStorageService.saveMasterCircularData(newData);
+      const success = localStorageService.saveAllCircularsData(newData);
       if (success) {
         setData(newData);
         setError(null);
@@ -39,11 +47,140 @@ export function useMasterCircularData() {
     }
   }, []);
 
+  // Normal circular methods
+  const getNormalCircularNames = useCallback(() => {
+    return localStorageService.getNormalCircularNames();
+  }, []);
+
+  const addNormalCircular = useCallback((circularName: string) => {
+    try {
+      const success = localStorageService.addNormalCircular(circularName);
+      if (success) {
+        const updatedData = localStorageService.getAllCircularsData();
+        setData(updatedData);
+        setError(null);
+      }
+      return success;
+    } catch (err) {
+      setError('Failed to add normal circular');
+      console.error('Error adding normal circular:', err);
+      return false;
+    }
+  }, []);
+
+  const deleteNormalCircular = useCallback((circularName: string) => {
+    try {
+      const success = localStorageService.deleteNormalCircular(circularName);
+      if (success) {
+        const updatedData = localStorageService.getAllCircularsData();
+        setData(updatedData);
+        setError(null);
+      }
+      return success;
+    } catch (err) {
+      setError('Failed to delete normal circular');
+      console.error('Error deleting normal circular:', err);
+      return false;
+    }
+  }, []);
+
+  const addClauseToNormalCircular = useCallback((
+    circularName: string,
+    clause: Clause,
+    parentClausePath?: string[]
+  ) => {
+    try {
+      const success = localStorageService.addClauseToNormalCircular(circularName, clause, parentClausePath);
+      if (success) {
+        const updatedData = localStorageService.getAllCircularsData();
+        setData(updatedData);
+        setError(null);
+      }
+      return success;
+    } catch (err) {
+      setError('Failed to add clause to normal circular');
+      console.error('Error adding clause to normal circular:', err);
+      return false;
+    }
+  }, []);
+
+  const updateClauseInNormalCircular = useCallback((
+    circularName: string,
+    clausePath: string[],
+    clause: Clause
+  ) => {
+    try {
+      const success = localStorageService.updateClauseInNormalCircular(circularName, clausePath, clause);
+      if (success) {
+        const updatedData = localStorageService.getAllCircularsData();
+        setData(updatedData);
+        setError(null);
+      }
+      return success;
+    } catch (err) {
+      setError('Failed to update clause in normal circular');
+      console.error('Error updating clause in normal circular:', err);
+      return false;
+    }
+  }, []);
+
+  const deleteClauseFromNormalCircular = useCallback((
+    circularName: string,
+    clausePath: string[]
+  ) => {
+    try {
+      const success = localStorageService.deleteClauseFromNormalCircular(circularName, clausePath);
+      if (success) {
+        const updatedData = localStorageService.getAllCircularsData();
+        setData(updatedData);
+        setError(null);
+      }
+      return success;
+    } catch (err) {
+      setError('Failed to delete clause from normal circular');
+      console.error('Error deleting clause from normal circular:', err);
+      return false;
+    }
+  }, []);
+
+  const addAnnexureToNormalCircular = useCallback((circularName: string, annexure: Annexure) => {
+    try {
+      const success = localStorageService.addAnnexureToNormalCircular(circularName, annexure);
+      if (success) {
+        const updatedData = localStorageService.getAllCircularsData();
+        setData(updatedData);
+        setError(null);
+      }
+      return success;
+    } catch (err) {
+      setError('Failed to add annexure to normal circular');
+      console.error('Error adding annexure to normal circular:', err);
+      return false;
+    }
+  }, []);
+
+  const deleteAnnexureFromNormalCircular = useCallback((circularName: string, annexureIndex: number) => {
+    try {
+      const success = localStorageService.deleteAnnexureFromNormalCircular(circularName, annexureIndex);
+      if (success) {
+        const updatedData = localStorageService.getAllCircularsData();
+        setData(updatedData);
+        setError(null);
+      }
+      return success;
+    } catch (err) {
+      setError('Failed to delete annexure from normal circular');
+      console.error('Error deleting annexure from normal circular:', err);
+      return false;
+    }
+  }, []);
+
+  // Master circular methods (existing, updated to work with new structure)
   const addChapter = useCallback((circularType: CircularType, chapter: Chapter) => {
     try {
       const success = localStorageService.addChapter(circularType, chapter);
       if (success) {
-        const updatedData = localStorageService.getMasterCircularData();
+        const updatedData = localStorageService.getAllCircularsData();
         setData(updatedData);
         setError(null);
       }
@@ -59,7 +196,7 @@ export function useMasterCircularData() {
     try {
       const success = localStorageService.updateChapter(circularType, chapterIndex, chapter);
       if (success) {
-        const updatedData = localStorageService.getMasterCircularData();
+        const updatedData = localStorageService.getAllCircularsData();
         setData(updatedData);
         setError(null);
       }
@@ -75,7 +212,7 @@ export function useMasterCircularData() {
     try {
       const success = localStorageService.deleteChapter(circularType, chapterIndex);
       if (success) {
-        const updatedData = localStorageService.getMasterCircularData();
+        const updatedData = localStorageService.getAllCircularsData();
         setData(updatedData);
         setError(null);
       }
@@ -96,7 +233,7 @@ export function useMasterCircularData() {
     try {
       const success = localStorageService.addClauseToChapter(circularType, chapterIndex, clause, parentClausePath);
       if (success) {
-        const updatedData = localStorageService.getMasterCircularData();
+        const updatedData = localStorageService.getAllCircularsData();
         setData(updatedData);
         setError(null);
       }
@@ -112,7 +249,7 @@ export function useMasterCircularData() {
     try {
       const success = localStorageService.addAnnexure(circularType, annexure);
       if (success) {
-        const updatedData = localStorageService.getMasterCircularData();
+        const updatedData = localStorageService.getAllCircularsData();
         setData(updatedData);
         setError(null);
       }
@@ -128,7 +265,7 @@ export function useMasterCircularData() {
     try {
       const success = localStorageService.deleteAnnexure(circularType, annexureIndex);
       if (success) {
-        const updatedData = localStorageService.getMasterCircularData();
+        const updatedData = localStorageService.getAllCircularsData();
         setData(updatedData);
         setError(null);
       }
@@ -140,8 +277,8 @@ export function useMasterCircularData() {
     }
   }, []);
 
-  const getStats = useCallback((circularType: CircularType) => {
-    return localStorageService.getDataStats(circularType);
+  const getStats = useCallback((circularType: CircularType | string, mode: CircularMode = 'master') => {
+    return localStorageService.getDataStats(circularType, mode);
   }, []);
 
   const exportData = useCallback(() => {
@@ -152,7 +289,7 @@ export function useMasterCircularData() {
     try {
       const success = localStorageService.importData(jsonString);
       if (success) {
-        const updatedData = localStorageService.getMasterCircularData();
+        const updatedData = localStorageService.getAllCircularsData();
         setData(updatedData);
         setError(null);
       }
@@ -173,7 +310,7 @@ export function useMasterCircularData() {
     try {
       const success = localStorageService.updateClause(circularType, chapterIndex, clausePath, clause);
       if (success) {
-        const updatedData = localStorageService.getMasterCircularData();
+        const updatedData = localStorageService.getAllCircularsData();
         setData(updatedData);
         setError(null);
       }
@@ -193,7 +330,7 @@ export function useMasterCircularData() {
     try {
       const success = localStorageService.deleteClause(circularType, chapterIndex, clausePath);
       if (success) {
-        const updatedData = localStorageService.getMasterCircularData();
+        const updatedData = localStorageService.getAllCircularsData();
         setData(updatedData);
         setError(null);
       }
@@ -209,7 +346,7 @@ export function useMasterCircularData() {
     try {
       const success = localStorageService.clearAllData();
       if (success) {
-        const defaultData = localStorageService.getMasterCircularData();
+        const defaultData = localStorageService.getAllCircularsData();
         setData(defaultData);
         setError(null);
       }
@@ -226,6 +363,16 @@ export function useMasterCircularData() {
     loading,
     error,
     saveData,
+    // Normal circular methods
+    getNormalCircularNames,
+    addNormalCircular,
+    deleteNormalCircular,
+    addClauseToNormalCircular,
+    updateClauseInNormalCircular,
+    deleteClauseFromNormalCircular,
+    addAnnexureToNormalCircular,
+    deleteAnnexureFromNormalCircular,
+    // Master circular methods
     addChapter,
     updateChapter,
     deleteChapter,
@@ -238,5 +385,18 @@ export function useMasterCircularData() {
     exportData,
     importData,
     clearAllData
+  };
+}
+
+// Legacy hook for backward compatibility
+export function useMasterCircularData() {
+  const circularData = useCircularData();
+  
+  // Transform the data to maintain backward compatibility
+  const legacyData = circularData.data ? circularData.data.master_circulars : null;
+  
+  return {
+    ...circularData,
+    data: legacyData
   };
 } 
