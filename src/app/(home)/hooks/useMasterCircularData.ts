@@ -49,8 +49,9 @@ export function useCircularData() {
 
   // Normal circular methods
   const getNormalCircularNames = useCallback(() => {
-    return localStorageService.getNormalCircularNames();
-  }, []);
+    if (!data) return [];
+    return Object.keys(data.normal_circulars);
+  }, [data]);
 
   const addNormalCircular = useCallback((circularName: string) => {
     try {
