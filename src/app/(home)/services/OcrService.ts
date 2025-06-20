@@ -6,6 +6,20 @@ export interface OcrResponse {
   error?: string;
 }
 
+export interface MultipleOcrResponse {
+  success: boolean;
+  results: Array<{
+    filename: string;
+    success: boolean;
+    text?: string;
+    error?: string;
+  }>;
+  combinedText?: string;
+  totalProcessed: number;
+  successCount: number;
+  errorCount: number;
+}
+
 export class OcrService {
   private static readonly OCR_API_URL = "https://master-ocr.onfinance.ai/ocr_image";
 
@@ -134,5 +148,64 @@ export class OcrService {
     }
 
     return this.extractTextFromImage(file);
+  }
+
+  static async processMultipleFiles(
+    files: File[],
+    onProgress?: (currentIndex: number, totalFiles: number, currentFileProgress: number) => void,
+    onFileComplete?: (filename: string, result: OcrResponse) => void
+  ): Promise<MultipleOcrResponse> {
+    const results: MultipleOcrResponse['results'] = [];
+    const successfulTexts: string[] = [];
+    let successCount = 0;
+    let errorCount = 0;
+
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      
+      try {
+        const result = await this.processImageFile(file, (progress) => {
+          onProgress?.(i, files.length, progress);
+        });
+
+        const fileResult = {
+          filename: file.name,
+          success: result.success,
+          text: result.text,
+          error: result.error,
+        };
+
+        results.push(fileResult);
+
+        if (result.success && result.text) {
+          successfulTexts.push(`--- ${file.name} ---\n${result.text}`);
+          successCount++;
+        } else {
+          errorCount++;
+        }
+
+        onFileComplete?.(file.name, result);
+
+      } catch (error) {
+        const fileResult = {
+          filename: file.name,
+          success: false,
+          error: error instanceof Error ? error.message : 'Unknown error occurred',
+        };
+
+        results.push(fileResult);
+        errorCount++;
+        onFileComplete?.(file.name, { success: false, error: fileResult.error });
+      }
+    }
+
+    return {
+      success: successCount > 0,
+      results,
+      combinedText: successfulTexts.length > 0 ? successfulTexts.join('\n\n') : undefined,
+      totalProcessed: files.length,
+      successCount,
+      errorCount,
+    };
   }
 }
