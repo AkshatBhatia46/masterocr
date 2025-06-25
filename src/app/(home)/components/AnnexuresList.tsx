@@ -5,17 +5,19 @@ import { useCircularData } from '../hooks/useMasterCircularData';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { FileText, Edit, Trash2 } from 'lucide-react';
+import { FileText, Edit, Plus, Trash2 } from 'lucide-react';
+import { NormalCircularClausesList } from './NormalCircularClausesList';
 
 interface AnnexuresListProps {
   annexures: Annexure[];
   circularType: CircularType | string;
   mode?: CircularMode;
+  onAddClause?: (annexureIndex: number, annexure: Annexure, parentClausePath?: string[]) => void;
   onEditAnnexure?: (annexureIndex: number, annexure: Annexure) => void;
   onDeleteAnnexure?: (annexureIndex: number, annexureTitle: string) => void;
 }
 
-export function AnnexuresList({ annexures, circularType, mode = 'master', onEditAnnexure, onDeleteAnnexure }: AnnexuresListProps) {
+export function AnnexuresList({ annexures, circularType, mode = 'master', onAddClause, onEditAnnexure, onDeleteAnnexure }: AnnexuresListProps) {
   const { deleteAnnexure, deleteAnnexureFromNormalCircular } = useCircularData();
 
   const handleDeleteAnnexure = (annexureIndex: number, annexureTitle: string) => {
@@ -85,6 +87,17 @@ export function AnnexuresList({ annexures, circularType, mode = 'master', onEdit
                 >
                   <Edit className="h-4 w-4" />
                 </Button>
+                {annexure.annexure_type === 'non-form' && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-8 w-8 p-0"
+                    title="Add clause"
+                    onClick={() => onAddClause?.(index, annexure)}
+                  >
+                    <Plus className="h-4 w-4" />
+                  </Button>
+                )}
                 <Button 
                   variant="ghost" 
                   size="sm"
@@ -104,6 +117,19 @@ export function AnnexuresList({ annexures, circularType, mode = 'master', onEdit
                   {annexure.annexure_content}
                 </p>
               </div>
+            </CardContent>
+          )}
+
+          {/* Clause list for non-form annexures */}
+          {annexure.annexure_type === 'non-form' && (
+            <CardContent>
+              <NormalCircularClausesList
+                clauses={annexure.clauses || []}
+                circularName={annexure.annexure_title}
+                onAddClause={(parentClausePath) => onAddClause?.(index, annexure, parentClausePath)}
+                onEditClause={() => {}}
+                onDeleteClause={() => {}}
+              />
             </CardContent>
           )}
         </Card>

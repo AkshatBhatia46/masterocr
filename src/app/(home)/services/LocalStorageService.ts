@@ -38,6 +38,40 @@ class LocalStorageService {
       }
       const parsedData = JSON.parse(data);
       
+      // Migrate annexures to include clauses array if missing
+      let annexureMigrationNeeded = false;
+      // Master circulars
+      for (const circularKey of Object.keys(parsedData.master_circulars || {})) {
+        const circular = (parsedData.master_circulars as any)[circularKey];
+        if (circular && Array.isArray(circular.annexures)) {
+          circular.annexures = circular.annexures.map((ann: any) => {
+            if (!Array.isArray(ann.clauses)) {
+              annexureMigrationNeeded = true;
+              return { ...ann, clauses: [] };
+            }
+            return ann;
+          });
+        }
+      }
+      // Normal circulars
+      if (parsedData.normal_circulars) {
+        for (const name of Object.keys(parsedData.normal_circulars)) {
+          const normal = parsedData.normal_circulars[name];
+          if (normal && Array.isArray(normal.annexures)) {
+            normal.annexures = normal.annexures.map((ann: any) => {
+              if (!Array.isArray(ann.clauses)) {
+                annexureMigrationNeeded = true;
+                return { ...ann, clauses: [] };
+              }
+              return ann;
+            });
+          }
+        }
+      }
+      if (annexureMigrationNeeded) {
+        this.saveAllCircularsData(parsedData);
+      }
+      
       // Migrate old data structure if needed
       if (parsedData.master_circular_2023 && !parsedData.master_circulars) {
         const migratedData: AllCircularsData = {
@@ -273,8 +307,8 @@ class LocalStorageService {
     }
   }
 
-  // Add updateAnnexureInNormalCircular method
-  updateAnnexureInNormalCircular(circularName: string, annexureIndex: number, annexure: Annexure): boolean {
+  // Re-add updateAnnexureInNormalCircular to update annexure entries
+  updateAnnexureInNormalCircular(circularName: string, annexureIndex: number, updatedAnnexure: Annexure): boolean {
     try {
       const data = this.getAllCircularsData();
       const circular = data.normal_circulars[circularName];
@@ -282,12 +316,52 @@ class LocalStorageService {
         return false;
       }
       if (annexureIndex >= 0 && annexureIndex < circular.annexures.length) {
-        circular.annexures[annexureIndex] = annexure;
+        circular.annexures[annexureIndex] = updatedAnnexure;
         return this.saveAllCircularsData(data);
       }
       return false;
     } catch (error) {
       console.error('Error updating annexure in normal circular:', error);
+      return false;
+    }
+  }
+
+  // Normal circular annexure clause methods
+  addClauseToNormalAnnexure(
+    circularName: string,
+    annexureIndex: number,
+    clause: Clause,
+    parentClausePath?: string[]
+  ): boolean {
+    try {
+      const data = this.getAllCircularsData();
+      const circular = data.normal_circulars[circularName];
+      if (!circular) {
+        throw new Error(`Normal circular "${circularName}" not found`);
+      }
+      const annexure = circular.annexures[annexureIndex];
+      if (!annexure) {
+        throw new Error(`Annexure at index ${annexureIndex} not found`);
+      }
+      if (!annexure.clauses) {
+        annexure.clauses = [];
+      }
+      if (!parentClausePath || parentClausePath.length === 0) {
+        annexure.clauses.push(clause);
+      } else {
+        const parent = this.findClauseByPath(annexure.clauses, parentClausePath);
+        if (parent) {
+          if (!parent.clauses) {
+            parent.clauses = [];
+          }
+          parent.clauses.push(clause);
+        } else {
+          throw new Error('Parent clause not found in annexure');
+        }
+      }
+      return this.saveAllCircularsData(data);
+    } catch (error) {
+      console.error('Error adding clause to normal annexure:', error);
       return false;
     }
   }
@@ -426,6 +500,43 @@ class LocalStorageService {
       return false;
     } catch (error) {
       console.error('Error updating annexure:', error);
+      return false;
+    }
+  }
+
+  // Master circular annexure clause methods
+  addClauseToAnnexure(
+    circularType: CircularType,
+    annexureIndex: number,
+    clause: Clause,
+    parentClausePath?: string[]
+  ): boolean {
+    try {
+      const data = this.getAllCircularsData();
+      const circularKey = `master_circular_${circularType}` as keyof MasterCircularData;
+      const annexure = data.master_circulars[circularKey].annexures[annexureIndex];
+      if (!annexure) {
+        throw new Error(`Annexure at index ${annexureIndex} not found`);
+      }
+      if (!annexure.clauses) {
+        annexure.clauses = [];
+      }
+      if (!parentClausePath || parentClausePath.length === 0) {
+        annexure.clauses.push(clause);
+      } else {
+        const parent = this.findClauseByPath(annexure.clauses, parentClausePath);
+        if (parent) {
+          if (!parent.clauses) {
+            parent.clauses = [];
+          }
+          parent.clauses.push(clause);
+        } else {
+          throw new Error('Parent clause not found in annexure');
+        }
+      }
+      return this.saveAllCircularsData(data);
+    } catch (error) {
+      console.error('Error adding clause to annexure:', error);
       return false;
     }
   }

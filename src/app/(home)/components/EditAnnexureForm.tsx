@@ -42,9 +42,11 @@ export function EditAnnexureForm({ circularType, annexureIndex, annexure, onClos
     setIsSubmitting(true);
     try {
       const updatedAnnexure: Annexure = {
+        ...annexure,
         annexure_title: annexureTitle.trim(),
         annexure_content: annexureContent.trim(),
         annexure_type: annexureType,
+        clauses: annexure.clauses || [],
       };
       const success = onUpdate(circularType, annexureIndex, updatedAnnexure);
       if (success) {

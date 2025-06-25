@@ -26,6 +26,7 @@ import { NormalCircularClausesList } from "./components/NormalCircularClausesLis
 import { useCircularData } from "./hooks/useMasterCircularData";
 import { CircularType, CircularMode } from "./types/masterCircular";
 import { EditAnnexureForm } from "./components/EditAnnexureForm";
+import { AddAnnexureClauseForm } from "./components/AddAnnexureClauseForm";
 
 export default function MasterCircularUploadPage() {
   const [circularMode, setCircularMode] = useState<CircularMode>("master");
@@ -40,6 +41,7 @@ export default function MasterCircularUploadPage() {
   const [showEditClauseForm, setShowEditClauseForm] = useState(false);
   const [showAddNormalCircularForm, setShowAddNormalCircularForm] = useState(false);
   const [showEditAnnexureForm, setShowEditAnnexureForm] = useState(false);
+  const [showAddAnnexureClauseForm, setShowAddAnnexureClauseForm] = useState(false);
   
   // Selection states
   const [selectedChapterForClause, setSelectedChapterForClause] = useState<{
@@ -58,6 +60,7 @@ export default function MasterCircularUploadPage() {
     clausePath: string[];
   } | null>(null);
   const [selectedAnnexureForEdit, setSelectedAnnexureForEdit] = useState<{ index: number; annexure: any } | null>(null);
+  const [selectedAnnexureForClause, setSelectedAnnexureForClause] = useState<{ annexureIndex: number; annexure: any; parentClausePath?: string[] } | null>(null);
 
   const {
     data,
@@ -72,6 +75,10 @@ export default function MasterCircularUploadPage() {
     deleteClauseFromNormalCircular,
     addAnnexureToNormalCircular,
     deleteAnnexureFromNormalCircular,
+    updateAnnexureInNormalCircular,
+    updateAnnexure,
+    addClauseToAnnexure,
+    addClauseToNormalAnnexure,
     // Master circular methods
     addChapter,
     updateChapter,
@@ -81,8 +88,6 @@ export default function MasterCircularUploadPage() {
     deleteClause,
     addAnnexure,
     deleteAnnexure,
-    updateAnnexureInNormalCircular,
-    updateAnnexure,
     getStats,
     exportData,
     importData,
@@ -286,6 +291,12 @@ export default function MasterCircularUploadPage() {
     setSelectedAnnexureForEdit(null);
   };
 
+  // Handler to add clause to annexure
+  const handleAddClauseToAnnexure = (annexureIndex: number, annexure: any, parentClausePath?: string[]) => {
+    setSelectedAnnexureForClause({ annexureIndex, annexure, parentClausePath });
+    setShowAddAnnexureClauseForm(true);
+  };
+
   const renderMainContent = () => {
     if (circularMode === 'normal' && normalCirculars.length === 0) {
       return null; // CircularSelection will handle the empty state
@@ -408,6 +419,7 @@ export default function MasterCircularUploadPage() {
                  annexures={currentData?.annexures || []}
                  circularType={circularMode === 'master' ? selectedCircular as CircularType : selectedCircular as string}
                  mode={circularMode}
+                 onAddClause={handleAddClauseToAnnexure}
                  onEditAnnexure={handleEditAnnexure}
                  onDeleteAnnexure={handleDeleteAnnexure}
                />
@@ -611,6 +623,23 @@ export default function MasterCircularUploadPage() {
                return updateClause(circularType, chapterIndex, clausePath, clause);
              } else {
                return updateClauseInNormalCircular(circularType, clausePath, clause);
+             }
+           }}
+         />
+       )}
+
+       {showAddAnnexureClauseForm && selectedAnnexureForClause && (
+         <AddAnnexureClauseForm
+           circularType={circularMode === 'master' ? selectedCircular as CircularType : selectedCircular as string}
+           annexureIndex={selectedAnnexureForClause.annexureIndex}
+           annexureTitle={selectedAnnexureForClause.annexure.annexure_title}
+           parentClausePath={selectedAnnexureForClause.parentClausePath}
+           onClose={() => setShowAddAnnexureClauseForm(false)}
+           onAdd={(circularTypeArg, annexureIndexArg, clause, parentClausePathArg) => {
+             if (circularMode === 'master') {
+               return addClauseToAnnexure(circularTypeArg as CircularType, annexureIndexArg, clause, parentClausePathArg);
+             } else {
+               return addClauseToNormalAnnexure(circularTypeArg, annexureIndexArg, clause, parentClausePathArg);
              }
            }}
          />

@@ -43,7 +43,8 @@ export function AddAnnexureForm({ circularType, onClose, onAdd }: AddAnnexureFor
       const newAnnexure: Annexure = {
         annexure_title: annexureTitle.trim(),
         annexure_content: annexureContent.trim(),
-        annexure_type: annexureType
+        annexure_type: annexureType,
+        clauses: []
       };
 
       const success = onAdd(circularType, newAnnexure);

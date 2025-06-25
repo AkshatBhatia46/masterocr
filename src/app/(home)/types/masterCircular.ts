@@ -21,6 +21,8 @@ export interface Annexure {
   annexure_title: string;
   annexure_content: string;
   annexure_type?: 'form' | 'non-form';
+  // Optional clauses for non-form annexures
+  clauses?: Clause[];
 }
 
 export interface CircularContent {

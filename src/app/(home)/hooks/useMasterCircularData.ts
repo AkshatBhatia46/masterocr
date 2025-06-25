@@ -312,6 +312,40 @@ export function useCircularData() {
     }
   }, []);
 
+  // Add clause to annexure for master circular
+  const addClauseToAnnexure = useCallback((circularType: CircularType, annexureIndex: number, clause: Clause, parentClausePath?: string[]) => {
+    try {
+      const success = localStorageService.addClauseToAnnexure(circularType, annexureIndex, clause, parentClausePath);
+      if (success) {
+        const updatedData = localStorageService.getAllCircularsData();
+        setData(updatedData);
+        setError(null);
+      }
+      return success;
+    } catch (err) {
+      setError('Failed to add clause to annexure');
+      console.error('Error adding clause to annexure:', err);
+      return false;
+    }
+  }, []);
+
+  // Add clause to annexure for normal circular
+  const addClauseToNormalAnnexure = useCallback((circularName: string, annexureIndex: number, clause: Clause, parentClausePath?: string[]) => {
+    try {
+      const success = localStorageService.addClauseToNormalAnnexure(circularName, annexureIndex, clause, parentClausePath);
+      if (success) {
+        const updatedData = localStorageService.getAllCircularsData();
+        setData(updatedData);
+        setError(null);
+      }
+      return success;
+    } catch (err) {
+      setError('Failed to add clause to normal annexure');
+      console.error('Error adding clause to normal annexure:', err);
+      return false;
+    }
+  }, []);
+
   const getStats = useCallback((circularType: CircularType | string, mode: CircularMode = 'master') => {
     return localStorageService.getDataStats(circularType, mode);
   }, []);
@@ -418,6 +452,8 @@ export function useCircularData() {
     addAnnexure,
     deleteAnnexure,
     updateAnnexure,
+    addClauseToAnnexure,
+    addClauseToNormalAnnexure,
     getStats,
     exportData,
     importData,
