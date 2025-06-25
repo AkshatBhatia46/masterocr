@@ -278,6 +278,40 @@ export function useCircularData() {
     }
   }, []);
 
+  // Add updateAnnexureInNormalCircular for normal circulars
+  const updateAnnexureInNormalCircular = useCallback((circularName: string, annexureIndex: number, annexure: Annexure) => {
+    try {
+      const success = localStorageService.updateAnnexureInNormalCircular(circularName, annexureIndex, annexure);
+      if (success) {
+        const updatedData = localStorageService.getAllCircularsData();
+        setData(updatedData);
+        setError(null);
+      }
+      return success;
+    } catch (err) {
+      setError('Failed to update annexure in normal circular');
+      console.error('Error updating annexure in normal circular:', err);
+      return false;
+    }
+  }, []);
+
+  // Add updateAnnexure for master circulars
+  const updateAnnexure = useCallback((circularType: CircularType, annexureIndex: number, annexure: Annexure) => {
+    try {
+      const success = localStorageService.updateAnnexure(circularType, annexureIndex, annexure);
+      if (success) {
+        const updatedData = localStorageService.getAllCircularsData();
+        setData(updatedData);
+        setError(null);
+      }
+      return success;
+    } catch (err) {
+      setError('Failed to update annexure');
+      console.error('Error updating annexure:', err);
+      return false;
+    }
+  }, []);
+
   const getStats = useCallback((circularType: CircularType | string, mode: CircularMode = 'master') => {
     return localStorageService.getDataStats(circularType, mode);
   }, []);
@@ -373,6 +407,7 @@ export function useCircularData() {
     deleteClauseFromNormalCircular,
     addAnnexureToNormalCircular,
     deleteAnnexureFromNormalCircular,
+    updateAnnexureInNormalCircular,
     // Master circular methods
     addChapter,
     updateChapter,
@@ -382,6 +417,7 @@ export function useCircularData() {
     deleteClause,
     addAnnexure,
     deleteAnnexure,
+    updateAnnexure,
     getStats,
     exportData,
     importData,

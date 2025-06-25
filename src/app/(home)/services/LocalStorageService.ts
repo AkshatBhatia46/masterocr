@@ -273,6 +273,25 @@ class LocalStorageService {
     }
   }
 
+  // Add updateAnnexureInNormalCircular method
+  updateAnnexureInNormalCircular(circularName: string, annexureIndex: number, annexure: Annexure): boolean {
+    try {
+      const data = this.getAllCircularsData();
+      const circular = data.normal_circulars[circularName];
+      if (!circular) {
+        return false;
+      }
+      if (annexureIndex >= 0 && annexureIndex < circular.annexures.length) {
+        circular.annexures[annexureIndex] = annexure;
+        return this.saveAllCircularsData(data);
+      }
+      return false;
+    } catch (error) {
+      console.error('Error updating annexure in normal circular:', error);
+      return false;
+    }
+  }
+
   // Existing master circular methods (updated to use new structure)
   addChapter(circularType: CircularType, chapter: Chapter): boolean {
     try {
@@ -391,6 +410,22 @@ class LocalStorageService {
       return false;
     } catch (error) {
       console.error('Error deleting annexure:', error);
+      return false;
+    }
+  }
+
+  // Add updateAnnexure method for master circular
+  updateAnnexure(circularType: CircularType, annexureIndex: number, annexure: Annexure): boolean {
+    try {
+      const data = this.getAllCircularsData();
+      const circularKey = `master_circular_${circularType}` as keyof MasterCircularData;
+      if (annexureIndex >= 0 && annexureIndex < data.master_circulars[circularKey].annexures.length) {
+        data.master_circulars[circularKey].annexures[annexureIndex] = annexure;
+        return this.saveAllCircularsData(data);
+      }
+      return false;
+    } catch (error) {
+      console.error('Error updating annexure:', error);
       return false;
     }
   }

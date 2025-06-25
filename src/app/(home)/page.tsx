@@ -25,6 +25,7 @@ import { EditClauseForm } from "./components/EditClauseForm";
 import { NormalCircularClausesList } from "./components/NormalCircularClausesList";
 import { useCircularData } from "./hooks/useMasterCircularData";
 import { CircularType, CircularMode } from "./types/masterCircular";
+import { EditAnnexureForm } from "./components/EditAnnexureForm";
 
 export default function MasterCircularUploadPage() {
   const [circularMode, setCircularMode] = useState<CircularMode>("master");
@@ -38,6 +39,7 @@ export default function MasterCircularUploadPage() {
   const [showEditChapterForm, setShowEditChapterForm] = useState(false);
   const [showEditClauseForm, setShowEditClauseForm] = useState(false);
   const [showAddNormalCircularForm, setShowAddNormalCircularForm] = useState(false);
+  const [showEditAnnexureForm, setShowEditAnnexureForm] = useState(false);
   
   // Selection states
   const [selectedChapterForClause, setSelectedChapterForClause] = useState<{
@@ -55,6 +57,7 @@ export default function MasterCircularUploadPage() {
     clause: any;
     clausePath: string[];
   } | null>(null);
+  const [selectedAnnexureForEdit, setSelectedAnnexureForEdit] = useState<{ index: number; annexure: any } | null>(null);
 
   const {
     data,
@@ -77,6 +80,9 @@ export default function MasterCircularUploadPage() {
     updateClause,
     deleteClause,
     addAnnexure,
+    deleteAnnexure,
+    updateAnnexureInNormalCircular,
+    updateAnnexure,
     getStats,
     exportData,
     importData,
@@ -255,6 +261,31 @@ export default function MasterCircularUploadPage() {
     setSelectedClauseForEdit(null);
   };
 
+  // New handlers for annexures
+  const handleEditAnnexure = (annexureIndex: number, annexure: any) => {
+    setSelectedAnnexureForEdit({ index: annexureIndex, annexure });
+    setShowEditAnnexureForm(true);
+  };
+
+  const handleDeleteAnnexure = (annexureIndex: number, annexureTitle: string) => {
+    const confirmed = confirm(`Are you sure you want to delete the annexure "${annexureTitle}"?`);
+    if (!confirmed) return;
+    let success: boolean;
+    if (circularMode === 'master') {
+      success = deleteAnnexure(selectedCircular as CircularType, annexureIndex);
+    } else {
+      success = deleteAnnexureFromNormalCircular(selectedCircular as string, annexureIndex);
+    }
+    if (!success) {
+      alert("Failed to delete annexure. Please try again.");
+    }
+  };
+
+  const closeEditAnnexureForm = () => {
+    setShowEditAnnexureForm(false);
+    setSelectedAnnexureForEdit(null);
+  };
+
   const renderMainContent = () => {
     if (circularMode === 'normal' && normalCirculars.length === 0) {
       return null; // CircularSelection will handle the empty state
@@ -377,6 +408,8 @@ export default function MasterCircularUploadPage() {
                  annexures={currentData?.annexures || []}
                  circularType={circularMode === 'master' ? selectedCircular as CircularType : selectedCircular as string}
                  mode={circularMode}
+                 onEditAnnexure={handleEditAnnexure}
+                 onDeleteAnnexure={handleDeleteAnnexure}
                />
              </TabsContent>
           </Tabs>
@@ -515,6 +548,22 @@ export default function MasterCircularUploadPage() {
                return addAnnexure(circularType, annexure);
              } else {
                return addAnnexureToNormalCircular(circularType, annexure);
+             }
+           }}
+         />
+       )}
+
+       {showEditAnnexureForm && selectedAnnexureForEdit && (
+         <EditAnnexureForm
+           circularType={circularMode === 'master' ? selectedCircular as CircularType : selectedCircular as string}
+           annexureIndex={selectedAnnexureForEdit.index}
+           annexure={selectedAnnexureForEdit.annexure}
+           onClose={closeEditAnnexureForm}
+           onUpdate={(circularTypeArg: any, annexureIndexArg: number, updatedAnnexure: any) => {
+             if (circularMode === 'master') {
+               return updateAnnexure(circularTypeArg, annexureIndexArg, updatedAnnexure);
+             } else {
+               return updateAnnexureInNormalCircular(circularTypeArg, annexureIndexArg, updatedAnnexure);
              }
            }}
          />

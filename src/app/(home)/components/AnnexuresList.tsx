@@ -11,17 +11,23 @@ interface AnnexuresListProps {
   annexures: Annexure[];
   circularType: CircularType | string;
   mode?: CircularMode;
+  onEditAnnexure?: (annexureIndex: number, annexure: Annexure) => void;
+  onDeleteAnnexure?: (annexureIndex: number, annexureTitle: string) => void;
 }
 
-export function AnnexuresList({ annexures, circularType, mode = 'master' }: AnnexuresListProps) {
+export function AnnexuresList({ annexures, circularType, mode = 'master', onEditAnnexure, onDeleteAnnexure }: AnnexuresListProps) {
   const { deleteAnnexure, deleteAnnexureFromNormalCircular } = useCircularData();
 
   const handleDeleteAnnexure = (annexureIndex: number, annexureTitle: string) => {
-    if (confirm(`Are you sure you want to delete the annexure "${annexureTitle}"?`)) {
-      if (mode === 'master') {
-        deleteAnnexure(circularType as CircularType, annexureIndex);
-      } else {
-        deleteAnnexureFromNormalCircular(circularType as string, annexureIndex);
+    if (onDeleteAnnexure) {
+      onDeleteAnnexure(annexureIndex, annexureTitle);
+    } else {
+      if (confirm(`Are you sure you want to delete the annexure "${annexureTitle}"?`)) {
+        if (mode === 'master') {
+          deleteAnnexure(circularType as CircularType, annexureIndex);
+        } else {
+          deleteAnnexureFromNormalCircular(circularType as string, annexureIndex);
+        }
       }
     }
   };
@@ -65,12 +71,16 @@ export function AnnexuresList({ annexures, circularType, mode = 'master' }: Anne
               </div>
               
               <div className="flex items-center gap-2">
-                <Button 
+                <Button
                   variant="ghost" 
                   size="sm"
                   className="h-8 w-8 p-0"
                   onClick={() => {
-                    console.log('Edit annexure:', annexure.annexure_title);
+                    if (onEditAnnexure) {
+                      onEditAnnexure(index, annexure);
+                    } else {
+                      console.log('Edit annexure:', annexure.annexure_title);
+                    }
                   }}
                 >
                   <Edit className="h-4 w-4" />
